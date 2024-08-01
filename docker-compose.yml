@@ -1,0 +1,37 @@
+networks:
+  base-app:
+    driver: bridge
+
+x-common: &common
+  restart: always
+  env_file:
+    - .env
+  networks:
+    - base-app
+
+services:
+  db:
+    <<: *common
+    container_name: $POSTGRES_HOST
+    image: postgres:14
+    ports:
+      - $POSTGRES_EXTERNAL_PORT:5432
+    volumes:
+      - $POSTGRES_MOUNT_PGDATA:/var/lib/postgresql/data
+  app:
+    <<: *common
+    container_name: $SERVER_HOST
+    build:
+      context: ./$SERVER_MOUNT_POINT
+      dockerfile: Dockerfile
+      args:
+        - POSTGRES_HOST=$POSTGRES_HOST
+        - POSTGRES_USER=$POSTGRES_USER
+        - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+        - POSTGRES_DB=$POSTGRES_DB
+        - SERVER_INTERNAL_PORT=$SERVER_INTERNAL_PORT
+        - SERVER_MOUNT_POINT=$SERVER_MOUNT_POINT
+    ports:
+      - $SERVER_EXTERNAL_PORT:$SERVER_INTERNAL_PORT
+    volumes:
+      - ./$SERVER_MOUNT_POINT:/$SERVER_MOUNT_POINT
