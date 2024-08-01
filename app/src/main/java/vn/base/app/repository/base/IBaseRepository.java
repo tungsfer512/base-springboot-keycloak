@@ -7,5 +7,5 @@ import org.springframework.data.repository.NoRepositoryBean;
 import vn.base.app.model.base.BaseModel;
 
 @NoRepositoryBean
-public interface IBaseRepository<T extends BaseModel> extends JpaRepository<T, String>, JpaSpecificationExecutor<T> {
+public interface IBaseRepository<T extends BaseModel> extends JpaRepository<T, Long>, JpaSpecificationExecutor<T> {
 }

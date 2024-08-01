@@ -29,7 +29,7 @@ public interface IBaseService<T extends BaseModel> {
 
     public long count(@Nullable List<Triple<String, List<Object>, EComparision>> filterConditions);
 
-    public T findById(String id);
+    public T findById(Long id);
 
     public T save(T entity);
 
@@ -37,6 +37,6 @@ public interface IBaseService<T extends BaseModel> {
 
     public void delete(T entity);
 
-    public void deleteById(String id);
+    public void deleteById(Long id);
 
 }

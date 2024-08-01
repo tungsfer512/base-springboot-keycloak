@@ -121,7 +121,7 @@ public class BaseService<T extends BaseModel> implements IBaseService<T> {
     }
 
     @Override
-    public T findById(String id) {
+    public T findById(Long id) {
         return repository.findById(id).orElseThrow(() -> new CustomException(EErorr.NOT_FOUND));
     }
 
@@ -161,7 +161,7 @@ public class BaseService<T extends BaseModel> implements IBaseService<T> {
     }
 
     @Override
-    public void deleteById(String id) {
+    public void deleteById(Long id) {
         repository.findById(id).orElseThrow(() -> new CustomException(EErorr.NOT_FOUND));
         repository.deleteById(id);
     }

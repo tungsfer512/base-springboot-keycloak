@@ -21,15 +21,15 @@ import vn.base.app.utils.Utils;
 public class BaseModel implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "_id")
     @Hidden
-    String id;
-    
+    Long id;
+
     @Column(name = "_created_at")
     @Hidden
     Long createdAt = Utils.TIMESTAMP_NOW();
-    
+
     @Column(name = "_updated_at")
     @Hidden
     Long updatedAt = Utils.TIMESTAMP_NOW();

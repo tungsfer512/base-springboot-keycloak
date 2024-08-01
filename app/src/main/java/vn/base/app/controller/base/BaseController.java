@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import vn.base.app.exception.CustomException;
@@ -40,6 +42,14 @@ public class BaseController<T extends BaseModel> {
         return service;
     }
 
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", ref = "CREATED"),
+            @ApiResponse(responseCode = "400", ref = "BAD_REQUEST"),
+            @ApiResponse(responseCode = "401", ref = "UNAUTHORIZED"),
+            @ApiResponse(responseCode = "403", ref = "FORBIDDEN"),
+            @ApiResponse(responseCode = "409", ref = "CONFLICT"),
+            @ApiResponse(responseCode = "500", ref = "INTERNAL_SERVER_ERROR")
+    })
     @PostMapping(path = "")
     public ResponseEntity<Object> add(
             HttpServletRequest request,
@@ -50,12 +60,22 @@ public class BaseController<T extends BaseModel> {
             T resData = service.save(entity);
             String jsonData = Utils.OBJECT_MAPPER().writeValueAsString(resData);
             return ControllerUtils.response(HttpStatus.CREATED, jsonData, null).response();
+        } catch (CustomException e) {
+            e.printStackTrace();
+            throw new CustomException(e.getStatus(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             throw new CustomException(EErorr.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", ref = "OK_LIST"),
+            @ApiResponse(responseCode = "400", ref = "BAD_REQUEST"),
+            @ApiResponse(responseCode = "401", ref = "UNAUTHORIZED"),
+            @ApiResponse(responseCode = "403", ref = "FORBIDDEN"),
+            @ApiResponse(responseCode = "500", ref = "INTERNAL_SERVER_ERROR")
+    })
     @GetMapping(path = "/all")
     public ResponseEntity<Object> getAll(
             HttpServletRequest request,
@@ -69,19 +89,29 @@ public class BaseController<T extends BaseModel> {
             JSONObject jsonMetadata = new JSONObject();
             jsonMetadata.put("pagination", metadataPagination);
             return ControllerUtils.response(HttpStatus.OK, jsonDatas, jsonMetadata).response();
+        } catch (CustomException e) {
+            e.printStackTrace();
+            throw new CustomException(e.getStatus(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             throw new CustomException(EErorr.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", ref = "OK_LIST"),
+            @ApiResponse(responseCode = "400", ref = "BAD_REQUEST"),
+            @ApiResponse(responseCode = "401", ref = "UNAUTHORIZED"),
+            @ApiResponse(responseCode = "403", ref = "FORBIDDEN"),
+            @ApiResponse(responseCode = "500", ref = "INTERNAL_SERVER_ERROR")
+    })
     @GetMapping(path = "")
     public ResponseEntity<Object> get(
             HttpServletRequest request,
             @RequestParam(name = "page", required = false, defaultValue = "1") int page,
             @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize,
             // START ADD filter conditions
-            // @RequestParam(name = "attribute", required = false) Object value,
+            @RequestParam(required = false) Map<String, Object> values,
             // End ADD filter conditions
             @RequestParam(name = "sorts", required = false) List<String> sorts) {
         try {
@@ -101,65 +131,112 @@ public class BaseController<T extends BaseModel> {
             JSONObject jsonMetadata = new JSONObject();
             jsonMetadata.put("pagination", metadataPagination);
             return ControllerUtils.response(HttpStatus.OK, jsonData, jsonMetadata).response();
+        } catch (CustomException e) {
+            e.printStackTrace();
+            throw new CustomException(e.getStatus(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             throw new CustomException(EErorr.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", ref = "OK_OBJECT"),
+            @ApiResponse(responseCode = "400", ref = "BAD_REQUEST"),
+            @ApiResponse(responseCode = "401", ref = "UNAUTHORIZED"),
+            @ApiResponse(responseCode = "403", ref = "FORBIDDEN"),
+            @ApiResponse(responseCode = "404", ref = "NOT_FOUND"),
+            @ApiResponse(responseCode = "500", ref = "INTERNAL_SERVER_ERROR")
+    })
     @GetMapping(path = "{id}")
     public ResponseEntity<Object> getById(
             HttpServletRequest request,
-            @PathVariable String id) {
+            @PathVariable Long id) {
         try {
             T data = service.findById(id);
             String jsonData = Utils.OBJECT_MAPPER().writeValueAsString(data);
             return ControllerUtils.response(HttpStatus.OK, jsonData).response();
+        } catch (CustomException e) {
+            e.printStackTrace();
+            throw new CustomException(e.getStatus(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             throw new CustomException(EErorr.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", ref = "NO_CONTENT"),
+            @ApiResponse(responseCode = "400", ref = "BAD_REQUEST"),
+            @ApiResponse(responseCode = "401", ref = "UNAUTHORIZED"),
+            @ApiResponse(responseCode = "403", ref = "FORBIDDEN"),
+            @ApiResponse(responseCode = "404", ref = "NOT_FOUND"),
+            @ApiResponse(responseCode = "500", ref = "INTERNAL_SERVER_ERROR")
+    })
     @DeleteMapping(path = "{id}")
     public ResponseEntity<Object> deleteById(
             HttpServletRequest request,
-            @PathVariable String id) {
+            @PathVariable Long id) {
         try {
             service.deleteById(id);
             return ControllerUtils.response(HttpStatus.NO_CONTENT).response();
+        } catch (CustomException e) {
+            e.printStackTrace();
+            throw new CustomException(e.getStatus(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             throw new CustomException(EErorr.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", ref = "OK_OBJECT"),
+            @ApiResponse(responseCode = "400", ref = "BAD_REQUEST"),
+            @ApiResponse(responseCode = "401", ref = "UNAUTHORIZED"),
+            @ApiResponse(responseCode = "403", ref = "FORBIDDEN"),
+            @ApiResponse(responseCode = "404", ref = "NOT_FOUND"),
+            @ApiResponse(responseCode = "500", ref = "INTERNAL_SERVER_ERROR")
+    })
     @PutMapping(path = "{id}")
     public ResponseEntity<Object> fullUpdateById(
             HttpServletRequest request,
-            @PathVariable String id,
+            @PathVariable Long id,
             @RequestBody @Valid T entity) {
         try {
             entity.setId(id);
             T resData = service.save(entity);
             String jsonData = Utils.OBJECT_MAPPER().writeValueAsString(resData);
             return ControllerUtils.response(HttpStatus.OK, jsonData).response();
+        } catch (CustomException e) {
+            e.printStackTrace();
+            throw new CustomException(e.getStatus(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             throw new CustomException(EErorr.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", ref = "OK_OBJECT"),
+            @ApiResponse(responseCode = "400", ref = "BAD_REQUEST"),
+            @ApiResponse(responseCode = "401", ref = "UNAUTHORIZED"),
+            @ApiResponse(responseCode = "403", ref = "FORBIDDEN"),
+            @ApiResponse(responseCode = "404", ref = "NOT_FOUND"),
+            @ApiResponse(responseCode = "500", ref = "INTERNAL_SERVER_ERROR")
+    })
     @PatchMapping(path = "{id}")
     public ResponseEntity<Object> partialUpdateById(
             HttpServletRequest request,
-            @PathVariable String id,
+            @PathVariable Long id,
             @RequestBody @Valid T entity) {
         try {
             entity.setId(id);
             T resData = service.save(entity);
             String jsonData = Utils.OBJECT_MAPPER().writeValueAsString(resData);
             return ControllerUtils.response(HttpStatus.OK, jsonData).response();
+        } catch (CustomException e) {
+            e.printStackTrace();
+            throw new CustomException(e.getStatus(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             throw new CustomException(EErorr.INTERNAL_SERVER_ERROR);

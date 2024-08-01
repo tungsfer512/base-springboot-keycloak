@@ -19,7 +19,7 @@ import jakarta.servlet.ServletResponse;
 public class ApiKeyAuthFilter extends RequestHeaderAuthenticationFilter {
 
     private static final String API_KEY_HEADER = "X-API-Key";
-    private static final String API_SECRET_HEADER = "X-API-Key-Secret";
+    private static final String API_SECRET_HEADER = "X-API-Key";
 
     public ApiKeyAuthFilter() {
         super();
@@ -34,7 +34,7 @@ public class ApiKeyAuthFilter extends RequestHeaderAuthenticationFilter {
                 System.out.println(apiKeyName);
                 String apiKeySecret = (String) authentication.getCredentials();
                 System.out.println(apiKeySecret);
-                if ("valid-api-key".equals(apiKeyName) && "valid-api-secret".equals(apiKeySecret)) {
+                if ("valid-api-key".equals(apiKeyName) && "valid-api-key".equals(apiKeySecret)) {
                     return new ApiKeyAuthenticationToken(apiKeyName, apiKeySecret,
                             Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN")));
                 } else {
