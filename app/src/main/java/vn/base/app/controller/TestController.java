@@ -21,6 +21,14 @@ import vn.base.app.utils.ControllerUtils;
 @Tag(name = "Test", description = "Test API")
 public class TestController {
 
+    @Operation(summary = "Test API", description = "Test API")
+    @GetMapping("public/test")
+    public ResponseEntity<Object> test() {
+        Function<String, String> callbackSuccess = null;
+        Function<String, String> callbackFail = null;
+        return ControllerUtils.testResponseForCallback(callbackSuccess, callbackFail).response();
+    }
+
     @Operation(summary = "Test API no calback", description = "Test API with no callback action executed")
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {

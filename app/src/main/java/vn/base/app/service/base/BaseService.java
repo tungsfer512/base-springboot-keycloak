@@ -32,6 +32,10 @@ public class BaseService<T extends BaseModel> implements IBaseService<T> {
     @Autowired
     IBaseRepository<T> repository;
 
+    public IBaseRepository<T> getRepository() {
+        return this.repository;
+    }
+
     Sort getSorts(@Nullable List<Pair<String, String>> sortConditions) {
         List<Order> orders = new ArrayList<>();
         if (sortConditions != null) {

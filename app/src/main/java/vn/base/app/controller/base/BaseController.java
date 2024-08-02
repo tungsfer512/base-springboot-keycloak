@@ -228,7 +228,7 @@ public class BaseController<T extends BaseModel> {
     public ResponseEntity<Object> partialUpdateById(
             HttpServletRequest request,
             @PathVariable Long id,
-            @RequestBody @Valid T entity) {
+            @RequestBody(required = false) @Valid T entity) {
         try {
             entity.setId(id);
             T resData = service.save(entity);
