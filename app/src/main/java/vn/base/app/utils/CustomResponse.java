@@ -16,20 +16,48 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomResponse<T> {
 
     T data;
     HttpStatus status;
+    int statusCode;
     JSONObject metadata;
+
+    public CustomResponse(int statusCode) {
+        this.statusCode = statusCode;
+        this.status = HttpStatus.valueOf(statusCode);
+        this.data = null;
+    }
 
     public CustomResponse(HttpStatus status) {
         this.status = status;
         this.data = null;
     }
 
+    public CustomResponse(int statusCode, T data) {
+        this.statusCode = statusCode;
+        this.status = HttpStatus.valueOf(statusCode);
+        this.data = data;
+    }
+
     public CustomResponse(HttpStatus status, T data) {
         this.status = status;
         this.data = data;
+    }
+
+    public CustomResponse(int statusCode, T data, JSONObject metadata) {
+        this.statusCode = statusCode;
+        this.status = HttpStatus.valueOf(statusCode);
+        this.data = data;
+        this.metadata = metadata;
     }
 
     public CustomResponse(HttpStatus status, T data, JSONObject metadata) {
@@ -220,22 +248,6 @@ public class CustomResponse<T> {
             responseData.put("metadata", this.metadata);
         }
         return new ResponseEntity<Object>(responseData.toMap(), this.status);
-    }
-
-    public HttpStatus getStatus() {
-        return this.status;
-    }
-
-    public void setStatus(HttpStatus status) {
-        this.status = status;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
     }
 
 }

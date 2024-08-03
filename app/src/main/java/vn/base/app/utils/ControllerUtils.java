@@ -103,6 +103,68 @@ public class ControllerUtils {
         return response;
     }
 
+    public static CustomResponse<Object> requestToExternal(
+            HttpMethod method,
+            String url,
+            List<Header> headers,
+            Map<String, String[]> params,
+            HttpEntity body,
+            @Nullable Function<HttpResponse, CustomResponse<Object>> callbackSuccess,
+            @Nullable Function<HttpResponse, CustomResponse<Object>> callbackFail)
+            throws Exception {
+        CustomHttpClientRequest httpRequest = new CustomHttpClientRequest(method, url, headers, params);
+        HttpResponse httpResponse = null;
+        if (body != null) {
+            httpResponse = httpRequest.request(body);
+        } else {
+            httpResponse = httpRequest.request();
+        }
+        HttpEntity httpEntity = httpResponse.getEntity();
+        ContentType contentType = ContentType.get(httpEntity);
+        Boolean responseTypeFile = false;
+        if (contentType != null &&
+                !contentType.getMimeType().toLowerCase()
+                        .contains(ContentType.APPLICATION_JSON.getMimeType().toLowerCase())
+                &&
+                !contentType.getMimeType().toLowerCase()
+                        .contains(ContentType.TEXT_PLAIN.getMimeType().toLowerCase())
+                &&
+                !contentType.getMimeType().toLowerCase()
+                        .contains(ContentType.TEXT_HTML.getMimeType().toLowerCase())
+                &&
+                !contentType.getMimeType().toLowerCase()
+                        .contains(ContentType.TEXT_XML.getMimeType().toLowerCase())
+                &&
+                !contentType.getMimeType().toLowerCase()
+                        .contains(ContentType.DEFAULT_TEXT.getMimeType().toLowerCase())) {
+            responseTypeFile = true;
+        }
+        String jsonResponse = null;
+        ByteArrayResource byteArrayResource = null;
+        CustomResponse<Object> response = null;
+        HttpStatus status = HttpStatus.valueOf(httpResponse.getStatusLine().getStatusCode());
+        if (callbackSuccess != null && status.is2xxSuccessful()) {
+            return callbackSuccess.apply(httpResponse);
+        }
+        if (callbackFail != null && !status.is2xxSuccessful()) {
+            return callbackFail.apply(httpResponse);
+        }
+        if (httpEntity != null) {
+            if (responseTypeFile) {
+                CustomLogger.info("RESPONSE FILE");
+                byteArrayResource = new ByteArrayResource(httpEntity.getContent().readAllBytes());
+                response = new CustomResponse<>(status, byteArrayResource);
+            } else {
+                CustomLogger.info("RESPONSE JSON/TEXT");
+                jsonResponse = EntityUtils.toString(httpEntity);
+                response = new CustomResponse<>(status, jsonResponse);
+            }
+        } else {
+            response = new CustomResponse<>(status);
+        }
+        return response;
+    }
+
     public static CustomResponse<Object> response(HttpResponse httpResponse, @Nullable JSONObject metadata)
             throws Exception {
         HttpEntity httpEntity = httpResponse.getEntity();
@@ -191,7 +253,21 @@ public class ControllerUtils {
         return new CustomResponse<>(status);
     }
 
+    public static CustomResponse<Object> response(int statusCode) {
+        HttpStatus status = HttpStatus.valueOf(statusCode);
+        return new CustomResponse<>(status);
+    }
+
     public static CustomResponse<Object> response(HttpStatus status, @Nullable Object obj) {
+        if (obj != null) {
+            return new CustomResponse<>(status, obj.toString());
+        } else {
+            return new CustomResponse<>(status);
+        }
+    }
+
+    public static CustomResponse<Object> response(int statusCode, @Nullable Object obj) {
+        HttpStatus status = HttpStatus.valueOf(statusCode);
         if (obj != null) {
             return new CustomResponse<>(status, obj.toString());
         } else {
@@ -201,6 +277,20 @@ public class ControllerUtils {
 
     public static CustomResponse<Object> response(HttpStatus status, @Nullable Object obj,
             @Nullable JSONObject metadata) {
+        if (obj != null) {
+            if (metadata != null) {
+                return new CustomResponse<>(status, obj.toString(), metadata);
+            } else {
+                return new CustomResponse<>(status, obj.toString());
+            }
+        } else {
+            return new CustomResponse<>(status);
+        }
+    }
+
+    public static CustomResponse<Object> response(int statusCode, @Nullable Object obj,
+            @Nullable JSONObject metadata) {
+        HttpStatus status = HttpStatus.valueOf(statusCode);
         if (obj != null) {
             if (metadata != null) {
                 return new CustomResponse<>(status, obj.toString(), metadata);

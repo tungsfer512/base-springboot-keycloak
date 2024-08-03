@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +19,8 @@ import vn.base.app.utils.ControllerUtils;
 
 @RestController
 @RequestMapping("api")
-@Tag(name = "Test", description = "Test API")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
+@Tag(name = "[Test]", description = "Test API")
 public class TestController {
 
     @Operation(summary = "Test API", description = "Test API")

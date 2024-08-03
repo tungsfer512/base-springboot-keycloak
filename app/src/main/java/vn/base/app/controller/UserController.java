@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -38,7 +39,8 @@ import vn.base.app.utils.Utils;
 
 @RestController
 @RequestMapping("/api/internal/users")
-@Tag(name = "User", description = "User API")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
+@Tag(name = "[User]", description = "User API")
 public class UserController extends BaseController<User> {
 
     @Value("${base.app.keycloak.realm}")
@@ -48,6 +50,7 @@ public class UserController extends BaseController<User> {
     private Keycloak keycloak;
 
     @Override
+    @Deprecated
     public ResponseEntity<Object> add(HttpServletRequest request, @Valid User entity) {
         try {
             List<CredentialRepresentation> credentialRepresentations = new ArrayList<>();
@@ -81,6 +84,7 @@ public class UserController extends BaseController<User> {
     }
 
     @Override
+    @Deprecated
     public ResponseEntity<Object> getAll(HttpServletRequest request, List<String> sorts) {
         try {
             List<UserRepresentation> users = keycloak.realm(KEYCLOAK_REALM).users().list();
@@ -112,6 +116,7 @@ public class UserController extends BaseController<User> {
     }
 
     @Override
+    @Deprecated
     public ResponseEntity<Object> get(HttpServletRequest request, int page, int pageSize, Map<String, Object> values,
             List<String> sorts) {
         try {
@@ -144,6 +149,7 @@ public class UserController extends BaseController<User> {
     }
 
     @Override
+    @Deprecated
     public ResponseEntity<Object> getById(HttpServletRequest request, Long id) {
         try {
             return super.getById(request, id);
@@ -157,6 +163,7 @@ public class UserController extends BaseController<User> {
     }
 
     @Override
+    @Deprecated
     public ResponseEntity<Object> deleteById(HttpServletRequest request, Long id) {
         try {
             User user = super.getService().findById(id);
@@ -176,6 +183,7 @@ public class UserController extends BaseController<User> {
     }
 
     @Override
+    @Deprecated
     public ResponseEntity<Object> fullUpdateById(HttpServletRequest request, Long id, @Valid User entity) {
         try {
             User user = super.getService().findById(id);
@@ -204,6 +212,7 @@ public class UserController extends BaseController<User> {
     }
 
     @Override
+    @Deprecated
     public ResponseEntity<Object> partialUpdateById(HttpServletRequest request, Long id, User entity) {
         try {
             User user = super.getService().findById(id);
@@ -243,6 +252,7 @@ public class UserController extends BaseController<User> {
             @ApiResponse(responseCode = "500", ref = "INTERNAL_SERVER_ERROR")
     })
     @GetMapping("me")
+    @Deprecated
     public ResponseEntity<Object> getMe(HttpServletRequest request, @AuthenticationPrincipal Jwt jwt) {
         try {
             String id = jwt.getClaim("sub");
@@ -279,6 +289,7 @@ public class UserController extends BaseController<User> {
             @ApiResponse(responseCode = "500", ref = "INTERNAL_SERVER_ERROR")
     })
     @GetMapping("me/permissions")
+    @Deprecated
     public ResponseEntity<Object> getMePermissions(HttpServletRequest request, @AuthenticationPrincipal Jwt jwt) {
         try {
             String id = jwt.getClaim("sub");
@@ -315,6 +326,7 @@ public class UserController extends BaseController<User> {
             @ApiResponse(responseCode = "500", ref = "INTERNAL_SERVER_ERROR")
     })
     @PutMapping("me")
+    @Deprecated
     public ResponseEntity<Object> fullUpdateMe(
             HttpServletRequest request,
             @AuthenticationPrincipal Jwt jwt,
@@ -354,6 +366,7 @@ public class UserController extends BaseController<User> {
             @ApiResponse(responseCode = "500", ref = "INTERNAL_SERVER_ERROR")
     })
     @PatchMapping("me")
+    @Deprecated
     public ResponseEntity<Object> partialUpdateMe(
             HttpServletRequest request,
             @AuthenticationPrincipal Jwt jwt,

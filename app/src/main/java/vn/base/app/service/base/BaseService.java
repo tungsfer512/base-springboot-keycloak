@@ -3,6 +3,7 @@ package vn.base.app.service.base;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
@@ -127,6 +128,11 @@ public class BaseService<T extends BaseModel> implements IBaseService<T> {
     @Override
     public T findById(Long id) {
         return repository.findById(id).orElseThrow(() -> new CustomException(EErorr.NOT_FOUND));
+    }
+
+    @Override
+    public Optional<T> findByIdOptional(Long id) {
+        return repository.findById(id);
     }
 
     @Override

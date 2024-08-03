@@ -1,6 +1,7 @@
 package vn.base.app.service.base;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
@@ -30,6 +31,8 @@ public interface IBaseService<T extends BaseModel> {
     public long count(@Nullable List<Triple<String, List<Object>, EComparision>> filterConditions);
 
     public T findById(Long id);
+
+    public Optional<T> findByIdOptional(Long id);
 
     public T save(T entity);
 

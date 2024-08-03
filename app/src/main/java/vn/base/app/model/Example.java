@@ -1,6 +1,5 @@
 package vn.base.app.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import jakarta.persistence.Entity;
@@ -15,7 +14,7 @@ import lombok.experimental.FieldDefaults;
 import vn.base.app.model.base.BaseModel;
 
 @Entity
-@Table(name = "_product")
+@Table(name = "_example")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -23,11 +22,10 @@ import vn.base.app.model.base.BaseModel;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class Product extends BaseModel {
+public class Example extends BaseModel {
 
     String name;
-    String category;
-    @JsonIgnore
+    String title;
     Long quantity;
 
 }
