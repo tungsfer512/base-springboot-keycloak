@@ -1,6 +1,7 @@
 package vn.base.app.config;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,8 +32,8 @@ import vn.base.app.utils.CustomResponse;
 @Configuration
 public class Swagger {
 
-    private String devUrl = Env.OPENAPI_DEV_URL;
-    private String prodUrl = Env.OPENAPI_PROD_URL;
+    @Value("${server.port}")
+    String port;
     @Value("${base.app.keycloak.url}")
     String KEYCLOAK_SERVER_URL;
     @Value("${base.app.keycloak.realm}")
@@ -51,6 +52,9 @@ public class Swagger {
     @Bean
     public OpenAPI myOpenAPI() {
 
+        final String generateUrl = "http://localhost:" + port;
+        final String devUrl = Env.OPENAPI_DEV_URL;
+        final String prodUrl = Env.OPENAPI_PROD_URL;
         CustomResponse<Object> OK_RESPONSE_LIST = new CustomResponse<>(HttpStatus.OK, new ArrayList<>());
         CustomResponse<Object> OK_RESPONSE_OBJECT = new CustomResponse<>(HttpStatus.OK, new JSONObject());
         CustomResponse<Object> CREATED_RESPONSE = new CustomResponse<>(HttpStatus.CREATED, new JSONObject());
@@ -136,6 +140,9 @@ public class Swagger {
         components.addSecuritySchemes("OAuth2", new SecurityScheme()
                 .type(SecurityScheme.Type.OAUTH2).flows(newOAuthFlows()));
 
+        Server generateServer = new Server();
+        generateServer.setUrl(generateUrl);
+        generateServer.setDescription("Server URL that auto generated");
         Server devServer = new Server();
         devServer.setUrl(devUrl);
         devServer.setDescription("Server URL in Development environment");
@@ -153,12 +160,11 @@ public class Swagger {
                 .contact(contact)
                 .description("This Swagger exposes endpoints to manage RIPT Base API.")
                 .license(mitLicense);
-        // return new OpenAPI().info(info).servers(List.of(devServer, prodServer));
         return new OpenAPI()
                 .addSecurityItem(new SecurityRequirement().addList("X-API-Key"))
                 .addSecurityItem(new SecurityRequirement().addList("OAuth2"))
                 .components(components)
                 .info(info)
-                .servers(null);
+                .servers(List.of(generateServer, devServer, prodServer));
     }
 }
